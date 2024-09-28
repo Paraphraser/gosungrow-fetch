@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+SCRIPT=$(basename "$0")
+
+if [ $# -ne 0 ] ; then
+   echo "Usage: $SCRIPT"
+   echo "       (filter: reads stdin, writes stdout)"
+   exit 1
+fi
+
+# define the substitutions (double quotes are SIGNIFICANT)
+EDITS="$(mktemp)"
+cat <<-EDITS >"$EDITS"
+s/"9999999_1_1_1.p1"/"DailyYield"/
+s/"9999999_1_1_1.p18"/"VoltagePhaseA"/
+s/"9999999_1_1_1.p2"/"TotalYield"/
+s/"9999999_1_1_1.p21"/"CurrentPhaseA"/
+s/"9999999_1_1_1.p24"/"PowerPhaseA"/
+s/"9999999_1_1_1.p5"/"MPPT1Voltage"/
+s/"9999999_1_1_1.p6"/"MPPT1Current"/
+s/"9999999_1_1_1.p7"/"MPPT2Voltage"/
+s/"9999999_1_1_1.p8"/"MPPT2Current"/
+s/"9999999_1_1_1.p8018"/"MeterActivePower"/
+s/"9999999_1_1_1.p83072"/"DailyFeedinEnergy"/
+s/"9999999_1_1_1.p83102"/"DailyPurchasedEnergy"/
+EDITS
+
+# apply the substitutions
+sed -f "$EDITS"
+
+# clean up
+rm "$EDITS"

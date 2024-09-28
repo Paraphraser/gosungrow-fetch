@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+# the name of this script is
+SCRIPT=$(basename "$0")
+
+# where is this script is running?
+WHERE=$(dirname "$(realpath "$0")")
+
+# variable specific to my installation
+SUNGROW_PSID=9999999
+SUNGROW_SG50RS=${SUNGROW_PSID}_1_1_1
+SUNGROW_METER=${SUNGROW_PSID}_7_1_1
+SUNGROW_PLANT=${SUNGROW_PSID}_11_0_0
+SUNGROW_WINET=${SUNGROW_PSID}_22_247_1
+
+# metrics to be fetched
+METRIC_MPPT1_Voltage=$SUNGROW_SG50RS.p5
+METRIC_MPPT2_Voltage=$SUNGROW_SG50RS.p7
+METRIC_MPPT1_Current=$SUNGROW_SG50RS.p6
+METRIC_MPPT2_Current=$SUNGROW_SG50RS.p8
+METRIC_Phase_A_Voltage=$SUNGROW_SG50RS.p18
+METRIC_Phase_A_Current=$SUNGROW_SG50RS.p21
+METRIC_Phase_A_Power=$SUNGROW_SG50RS.p24
+METRIC_Daily_Yield=$SUNGROW_SG50RS.p1
+METRIC_Total_Yield=$SUNGROW_SG50RS.p2
+METRIC_Meter_Active_Power=$SUNGROW_METER.p8018
+METRIC_Daily_FeedIn_Energy=$SUNGROW_PLANT.p83072
+METRIC_Daily_Purchased_Energy=$SUNGROW_PLANT.p83102
+
+# portal data is stored here
+PORTAL="$HOME/Portal/$SUNGROW_PSID"
+
+# ensure it exists
+mkdir -p "$PORTAL"
+
+# running interactively ?
+if [ ! -t 0 ] ; then
+
+	# no! set up logging
+	LOGFILE="$PORTAL/$SCRIPT.log"
+	touch "$LOGFILE"
+	exec >> "$LOGFILE" 2>&1
+
+fi
+
+# the default bias means "yesterday"
+BIAS=${1:-"1"}
+
+echo "Executing: $SCRIPT $BIAS"
+echo "           (where the argument implies $BIAS day(s) ago)"
+
+echo "Starting at $(date)"
+
+# the date for which data should be fetched is
+FETCH_DATE=$(date -v -${BIAS}d "+%Y%m%d")
+FETCH_YYYY=$(date -v -${BIAS}d "+%Y")
+FETCH_YYYYMM=$(date -v -${BIAS}d "+%Y-%m")
+
+# the folder the result will be written into is
+FETCH_PATH="$PORTAL/$FETCH_YYYY/$FETCH_YYYYMM"
+
+# the file the result will be written into at FETCH_PATH is
+FETCH_FILE=$(date -v -${BIAS}d "+%Y-%m-%d").csv
+
+# together, the path and file are the result
+FETCH_RESULT="$FETCH_PATH/$FETCH_FILE"
+
+# does the fetch path exist?
+if [ ! -d "$FETCH_PATH" ] ; then
+
+	# no! auto-create
+	echo "Some or all of the following does not exist:"
+	echo "   $FETCH_PATH"
+	echo "Auto-creating..."
+	mkdir -p "$FETCH_PATH"
+
+fi
+
+# does the fetch result already exist?
+if [ ! -e "$FETCH_RESULT" ] ; then
+
+	# no! so set about downloading the data
+	GoSungrow show point data \
+		${FETCH_DATE}0000 ${FETCH_DATE}2359 5 \
+		$METRIC_MPPT1_Voltage \
+		$METRIC_MPPT1_Current \
+		$METRIC_MPPT2_Voltage \
+		$METRIC_MPPT2_Current \
+		$METRIC_Phase_A_Voltage \
+		$METRIC_Phase_A_Current \
+		$METRIC_Phase_A_Power \
+		$METRIC_Daily_Yield \
+		$METRIC_Total_Yield \
+		$METRIC_Daily_FeedIn_Energy \
+		$METRIC_Daily_Purchased_Energy \
+		$METRIC_Meter_Active_Power \
+		| sungrowToCSV > "$FETCH_RESULT"
+
+	# did that succeed?
+	if [ -e "$FETCH_RESULT" ] ; then
+
+		# yes! declare success
+		echo "$FETCH_FILE downloaded successfully"
+
+	else
+
+		echo "Warning: failed to fetch $FETCH_FILE"
+
+	fi
+
+else
+
+	echo "Warning: $FETCH_FILE already exists. Skipped."
+
+fi
+
+echo "Finished at $(date)"
+
