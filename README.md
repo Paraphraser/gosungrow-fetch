@@ -47,7 +47,7 @@ On the assumption that you will want to extend the example script to include oth
 
 Run the following commands:
 
-```
+``` console
 $ GoSungrow show ps list
 $ GoSungrow show ps points >ps-points.txt
 $ GoSungrow show ps tree
@@ -57,7 +57,7 @@ For the `show ps points` command, I recommend redirecting standard output to a f
 
 [Figure 1](#figure1) is an example of the kind of patterns you should expect to see after you have run those commands.
 
-| <a name="figure1"></a/>Figure 1: Assembling Metric Identifiers |
+| <a name="figure1"></a>Figure 1: Assembling Metric Identifiers  |
 |:--------------------------------------------------------------:|
 |![Assembling Metric Identifiers](./images/metric-discovery.png) |
 
@@ -66,14 +66,14 @@ I have selected three metrics as examples. Begin with the `show ps points` outpu
 1. "MPPT1 Voltage" <!--A-->&#x1F130;
 
 	* Make a note of the value in the "Id" column at which is "p5" <!--B-->&#x1F131;
-	* Take the value of the "Device Type" column at <!--C-->&#x1F132;**** which is "1", and use it to find the same value in the "Device Type" column of the `show ps list` output at <!--D-->&#x1F133;
-	* Make a note of the value in the "Ps Key" column at <!--E-->&#x1F134;, which is "9999999_1_1_1"	
-	* The metric identifier is the dot-concatenation of the "Ps Key" <!--E-->&#x1F134; with the "Id` at <!--B-->&#x1F131;:
+	* Use the value of the "Device Type" column at <!--C-->&#x1F132; which is "1", and use it to find the same value in the "Device Type" column of the `show ps list` output at <!--D-->&#x1F133;
+	* Make a note of the value in the "Ps Key" column at <!--E-->&#x1F134;, which is "9999999_1_1_1"
+	* The metric identifier is the dot-concatenation of the "Ps Key" <!--E-->&#x1F134; with the "Id" at <!--B-->&#x1F131;:
 
 		```
 		METRIC_MPPT1_Voltage=9999999_1_1_1.p5
 		```
-		
+
 2. "Meter Active Power" <!--F-->&#x1F135;
 
 	Repeat the same process as for "MPPT1 Voltage" following the paths from <!--F-->&#x1F135; to <!--J-->&#x1F139;. You should wind up with a metric identifier of:
@@ -83,7 +83,7 @@ I have selected three metrics as examples. Begin with the `show ps points` outpu
 	```
 
 	While you are here, observe that the values in the "Ps Key" column are the result of concatenating the values in the "Ps Id", "Device Type", "Device Code" and "Channel Id" columns using underscores as separators.
-	
+
 	Also observe the **position** of the "Device Type" value in each "Ps Key" string. This will become important in a moment.
 
 3. "Feed-in Energy Today" <!--K-->&#x1F13A;
@@ -97,14 +97,14 @@ I have selected three metrics as examples. Begin with the `show ps points` outpu
 		```
 
 	I have no idea why some Device Types are omitted from `show ps list`. In my case, Device Type 11 appears to be associated with the "Plant" concept and the value in the "Device Name" column is the name I gave the plant under guidance from the installer.
-	
+
 ### testing metrics
 
 You can test whether a metric is returning the data you expect by setting a smallish timespan that is likely to contain sensible data at the time of measurement (ie "when the sun is shining"). In [Figure 2](#figure2) "today" is Friday Sep 27, 2024 so "yesterday" is "20240926" and the timespan is 1200 through 1215 at five-minute intervals for `METRIC_MPPT1_Voltage`:
 
-| <a name="figure2"></a/>Figure 2: Testing Metric Identifiers |
-|:--------------------------------------------------------------:|
-|![Testing Metric Identifiers](./images/metric-testing.png) |
+| <a name="figure2"></a>Figure 2: Testing Metric Identifiers |
+|:----------------------------------------------------------:|
+|![Testing Metric Identifiers](./images/metric-testing.png)  |
 
 ### variable simplification
 
@@ -116,7 +116,7 @@ You can keep iterating through the process of discovering and testing metric ide
 	SUNGROW_SG50RS=9999999_1_1_1
 	METRIC_MPPT1_Voltage=${SUNGROW_SG50RS}.p5
 	```
-	
+
 2. Abstract the common "Ps ID":
 
 	```
@@ -187,7 +187,7 @@ $ updateSungrowData 1
 
 [Figure 3](#figure3) is from my own system. The fields in the header row might seem like they're a bit on the "uninformative" side but in practice they're fairly easy to deal with.
 
-| <a name="figure3"></a/>Figure 3: Sample Output (CSV) |
+| <a name="figure3"></a>Figure 3: Sample Output (CSV)  |
 |:----------------------------------------------------:|
 |![Sample CSV output](./images/metric-csv.png)         |
 
