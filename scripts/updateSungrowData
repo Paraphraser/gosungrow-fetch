@@ -51,16 +51,32 @@ echo "           (where the argument implies $BIAS day(s) ago)"
 
 echo "Starting at $(date)"
 
-# the date for which data should be fetched is
-FETCH_DATE=$(date -v -${BIAS}d "+%Y%m%d")
-FETCH_YYYY=$(date -v -${BIAS}d "+%Y")
-FETCH_YYYYMM=$(date -v -${BIAS}d "+%Y-%m")
+if [ "$(uname -s)" = "Darwin" ] ; then
+
+	# macOS date semantics
+	# the date for which data should be fetched is
+	FETCH_DATE=$(date -v -${BIAS}d "+%Y%m%d")
+	FETCH_YYYY=$(date -v -${BIAS}d "+%Y")
+	FETCH_YYYYMM=$(date -v -${BIAS}d "+%Y-%m")
+
+	# the file the result will be written into at FETCH_PATH is
+	FETCH_FILE=$(date -v -${BIAS}d "+%Y-%m-%d").csv
+
+else
+
+	# (assumed) Linux date semantics
+	# the date for which data should be fetched is
+	FETCH_DATE=$(date -d "now -${BIAS} day" "+%Y%m%d")
+	FETCH_YYYY=$(date -d "now -${BIAS} day" "+%Y")
+	FETCH_YYYYMM=$(date -d "now -${BIAS} day" "+%Y-%m")
+
+	# the file the result will be written into at FETCH_PATH is
+	FETCH_FILE=$(date -d "now -${BIAS} day" "+%Y-%m-%d").csv
+
+fi
 
 # the folder the result will be written into is
 FETCH_PATH="$PORTAL/$FETCH_YYYY/$FETCH_YYYYMM"
-
-# the file the result will be written into at FETCH_PATH is
-FETCH_FILE=$(date -v -${BIAS}d "+%Y-%m-%d").csv
 
 # together, the path and file are the result
 FETCH_RESULT="$FETCH_PATH/$FETCH_FILE"
