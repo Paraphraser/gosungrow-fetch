@@ -29,6 +29,36 @@ In essence, the filter:
 
 The `SQLiteTypeAffinity` enum is an affordance I use in many Swift programs. Although SQLite is not being used in this program, the enum is a handy way to determine whether a token needs to be quoted. You will need to come up with your own approach if you roll your own filter.
 
+## setup
+
+If you haven't already done so, configure GoSungrow:
+
+```
+$ GoSungrow config write \
+   --user=«user» \
+   --password=«password» \
+   --appkey «appkey» \
+   --host «URL»
+```
+
+where:
+
+* `«user»` is your iSolarCloud username. I believe you can use either an email address or an account name for this.
+* `«password»` is your iSolarCloud password.
+* `«appkey»` is your API key.
+* `«URL»` points to the iSolarCloud service you need to use (defaults to Australia). 
+
+If you need help on the last two, please see 
+[Configuration](https://gist.github.com/Paraphraser/cad3b0aa6428c58ee87bc835ac12ed37#configuration).
+
+You only need to do this setup once per computer.
+
+The acid test is if you can login:
+
+```console
+$ GoSungrow api login
+```
+
 ## updateSungrowData
 
 ### your Sungrow PsID
